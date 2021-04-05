@@ -1,5 +1,5 @@
 *.json
-*.py
-!proj2_nps.py
+proj2_nps_test.py
+secret.py
 .pytest_cache/
 __pychache__/
