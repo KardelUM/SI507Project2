@@ -118,6 +118,9 @@ def get_site_instance(site_url):
     name = titleContainer.find("a").text
     category = titleContainer.find("span", class_="Hero-designation").text
     address_p = bs.find("p", class_="adr")
+    # print(address_p, site_url)
+    if address_p is None:
+        return None
     addr = address_p.find("span", {"itemprop": "addressLocality"})
     state = address_p.find("span", {"itemprop": "addressRegion"})
     postalCode = address_p.find("span", {"itemprop": "postalCode"})
@@ -160,7 +163,8 @@ def get_sites_for_state(state_url):
 
         park_url = BASE_URL + block.find("div").find("h3").find("a")["href"]
         nationalSite = get_site_instance(park_url)
-        nationalSites.append(nationalSite)
+        if nationalSite is not None:
+            nationalSites.append(nationalSite)
         # cache[state_url] = nationalSites
     return nationalSites
 
@@ -202,6 +206,7 @@ def get_nearby_places(site_object: NationalSite):
     return d
     # urllib.request.open("")
 
+
 def main():
     state_dict = build_state_url_dict()
     while True:
@@ -230,20 +235,27 @@ def main():
                 print(SEPERATOR)
                 print("Places near", ns.name)
                 print(SEPERATOR)
+                if "searchResults" not in nearJsDict:
+                    print("No such near results")
+                    print(SEPERATOR)
+                    continue
                 for result in nearJsDict["searchResults"]:
                     fields = result["fields"]
-                    if "group_sic_code_name" not in fields or fields["group_sic_code_name"] == "":
+                    if "group_sic_code_name" not in fields or fields["group_sic_code_name"] == "" or \
+                            fields["group_sic_code_name"] is None:
                         category = "no category"
                     else:
                         category = fields["group_sic_code_name"]
-                    if "address" not in fields or fields["address"] == "":
+                    if "address" not in fields or fields["address"] == "" or fields["address"] is None:
                         address = "no address"
                     else:
                         address = fields["address"]
-                    if "city" not in fields or fields["city"] == "":
+                    if "city" not in fields or fields["city"] == "" or fields["city"] is None:
                         city = "no city"
                     else:
                         city = fields["city"]
+                    # print(result)
+                    # print(address)
                     street_address = address + ", " + city
                     name = result["name"]
                     info = name + " (" + category + "): " + street_address
