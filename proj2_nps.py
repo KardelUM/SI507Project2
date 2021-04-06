@@ -1,6 +1,6 @@
 #################################
-##### Name: Yufeng Chen
-##### Uniqname: Kardel
+##### Name:
+##### Uniqname:
 #################################
 import os
 from bs4 import BeautifulSoup
@@ -76,7 +76,9 @@ def build_state_url_dict():
     CACHE_FILENAME = "STATE_URL_DICT.json"
     cache = openCache(CACHE_FILENAME)
     if len(cache) != 0:
+        print("Using cache")
         return cache
+    print("Fetching")
     response = urllib.request.urlopen(TARGET_URL)
     html = response.read().decode('utf-8')
     response.close()
@@ -213,6 +215,9 @@ def main():
         token = input("Enter a state name (e.g. Michigan, michigan) or exit: ").strip().lower()
         if token == "exit":
             return
+        if token not in state_dict:
+            print("[Error] Enter proper state name")
+            continue
         nationalStates = get_sites_for_state(state_dict[token])
         SEPERATOR = "----------------------------------"
         print(SEPERATOR)
@@ -268,4 +273,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
